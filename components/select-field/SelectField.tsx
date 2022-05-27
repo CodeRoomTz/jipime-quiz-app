@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { SetStateAction, useState } from 'react'
 import { FormControl, InputLabel, MenuItem, Select } from '@mui/material';
 import { Box } from '@mui/system';
 
@@ -7,13 +7,13 @@ interface SelectFieldProps {
 }
 const SelectField = ({ label }: SelectFieldProps) => {
     const [value, setValue] = useState("second")
-    const handleSelectChange = () => { }
+    const handleSelectChange = (e: { target: { value: SetStateAction<string>; }; }) => { setValue(e.target.value as string) }
 
     return (
         <Box mt={3} width="100%">
             <FormControl fullWidth size="small">
-                <InputLabel>{label}</InputLabel>
-                <Select value={value} label={label} onChange={handleSelectChange}>
+                <InputLabel id={label}>{label}</InputLabel>
+                <Select value={value} labelId={label} label={label} onChange={handleSelectChange}>
                     <MenuItem>Option 1</MenuItem>
                     <MenuItem>Option 2</MenuItem>
                     <MenuItem>Option 3</MenuItem>

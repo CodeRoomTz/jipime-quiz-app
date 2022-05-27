@@ -1,5 +1,4 @@
 import { Box, Button } from '@mui/material'
-import React, { DOMAttributes } from 'react'
 import SelectField from '../components/select-field'
 import TextFieldInput from '../components/text-field';
 const setting = () => {
