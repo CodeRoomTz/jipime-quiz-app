@@ -3,9 +3,10 @@ import { FormControl, InputLabel, MenuItem, Select } from '@mui/material';
 import { Box } from '@mui/system';
 
 interface SelectFieldProps {
-    label?: string
+    label?: string,
+    options: { id: string, name: string }[]
 }
-const SelectField = ({ label }: SelectFieldProps) => {
+const SelectField = ({ label, options }: SelectFieldProps) => {
     const [value, setValue] = useState("second")
     const handleSelectChange = (e: { target: { value: SetStateAction<string>; }; }) => { setValue(e.target.value as string) }
 
@@ -14,9 +15,10 @@ const SelectField = ({ label }: SelectFieldProps) => {
             <FormControl fullWidth size="small">
                 <InputLabel id={label}>{label}</InputLabel>
                 <Select value={value} labelId={label} label={label} onChange={handleSelectChange}>
-                    <MenuItem>Option 1</MenuItem>
-                    <MenuItem>Option 2</MenuItem>
-                    <MenuItem>Option 3</MenuItem>
+                    {options.map(({ name, id }, index) => (
+                        <MenuItem key={`${index}${id}`} value={id}>{name}</MenuItem>
+
+                    ))}
                 </Select>
             </FormControl>
         </Box>

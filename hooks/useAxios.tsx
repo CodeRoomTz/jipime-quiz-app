@@ -1,4 +1,4 @@
-import Axios from 'axios'
+import Axios, { AxiosError, AxiosResponse } from 'axios'
 import { useEffect, useState } from 'react'
 
 interface useAxiosProps {
@@ -8,15 +8,15 @@ interface useAxiosProps {
 Axios.defaults.baseURL = 'https://opentdb.com/'
 
 const useAxios = ({ url }: useAxiosProps) => {
-    const [response, setResponse] = useState(null)
-    const [error, setError] = useState("")
+    const [response, setResponse] = useState<AxiosResponse>()
+    const [error, setError] = useState<AxiosError>()
     const [loading, setLoading] = useState(true)
 
     useEffect(() => {
         const fetchData = () => {
             Axios.get(url)
-                .then(res => setResponse(res.data))
-                .catch(error => setError(error.message))
+                .then(res => setResponse(res))
+                .catch(error => setError(error))
                 .finally(() => setLoading(false))
         }
         fetchData()
