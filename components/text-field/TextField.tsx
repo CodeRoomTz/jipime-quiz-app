@@ -1,14 +1,25 @@
 import React from 'react'
 import { FormControl, TextField } from "@mui/material";
 import { Box } from "@mui/system";
+import { useDispatch } from 'react-redux';
+import { addNumberOfQuestions } from '../../store/features/settingSlice/SettingSlice';
 
 interface TextFieldInputProps {
-    type?: string
+    type?: string,
+    label: string
 }
-const TextFieldInput = ({ type = 'string' }: TextFieldInputProps) => {
+const TextFieldInput = ({ type = 'string', label }: TextFieldInputProps) => {
+
+    const dispatch = useDispatch()
 
     const handleChange = (event: { target: { value: any; }; }) => {
-        console.log(event.target.value)
+        switch (label) {
+            case "Amount of Questions":
+                dispatch(addNumberOfQuestions(event.target.value))
+                break;
+            default:
+                break;
+        }
     };
 
     return (
@@ -17,7 +28,7 @@ const TextFieldInput = ({ type = 'string' }: TextFieldInputProps) => {
                 <TextField
                     onChange={handleChange}
                     variant="outlined"
-                    label="Amount of Questions"
+                    label={label}
                     type={type}
                     size="small"
                 />

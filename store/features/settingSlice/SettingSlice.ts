@@ -10,7 +10,27 @@ const initialState = {
 const settingSlice = createSlice({
   name: "setting",
   initialState,
-  reducers: {},
+  reducers: {
+    addCategory: (state, action) => {
+      const category = action.payload;
+      state.question_category = category;
+    },
+    addType: (state, action) => {
+      const type = action.payload;
+      state.question_type = type;
+    },
+    addDifficulty: (state, action) => {
+      const difficulty = action.payload;
+      state.question_difficulty = difficulty;
+    },
+    addNumberOfQuestions: (state, action) => {
+      const amount_of_question = action.payload;
+      state.amount_of_question = amount_of_question;
+    },
+  },
 });
 
+export const { addCategory, addDifficulty, addNumberOfQuestions, addType } =
+  settingSlice.actions;
+  
 export default settingSlice.reducer;
