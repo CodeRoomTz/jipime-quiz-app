@@ -1,54 +1,92 @@
-import { Button, FormControl, FormControlLabel, FormHelperText, FormLabel, Radio, RadioGroup, Typography } from '@mui/material'
+import { Button, CircularProgress, Typography } from '@mui/material'
 import { Box } from '@mui/system'
-import React from 'react'
-import { useSelector } from 'react-redux';
+import React, { useEffect, useState } from 'react'
+import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../store'
+import useAxios from '../hooks/useAxios';
+import { decode } from 'html-entities';
+import { handleScoreChange } from '../store/features/scoreSlice/scoreSlice';
+
+const getRandomInt = (max: number) => {
+    return Math.floor(Math.random() * Math.floor(max));
+};
+
 const Questions = () => {
-    const [value, setValue] = React.useState('');
-    const [error, setError] = React.useState(false);
-    const [helperText, setHelperText] = React.useState('Choose wisely');
+    const [questionIndex, setQuestionIndex] = useState(0);
+    const [options, setOptions] = useState<string[]>([]);
 
-    const { amount_of_question } = useSelector((store: RootState) => store.setting)
-    const handleRadioChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        setValue((event.target as HTMLInputElement).value);
-        setHelperText(' ');
-        setError(false);
-    };
+    const dispatch = useDispatch()
 
-    const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
-        event.preventDefault();
+    const {
+        question_category,
+        question_difficulty,
+        question_type,
+        amount_of_question,
+    } = useSelector((state: RootState) => state.setting)
+    const { score } = useSelector((store: RootState) => store.score)
 
-        if (value === 'best') {
-            setHelperText('You got it!');
-            setError(false);
-        } else if (value === 'worst') {
-            setHelperText('Sorry, wrong answer!');
-            setError(true);
-        } else {
-            setHelperText('Please select an option.');
-            setError(true);
+    let apiUrl = `/api.php?amount=${amount_of_question}`
+
+    if (question_category) {
+        apiUrl = apiUrl.concat(`&category=${question_category}`);
+    }
+    if (question_difficulty) {
+        apiUrl = apiUrl.concat(`&difficulty=${question_difficulty}`);
+    }
+    if (question_type) {
+        apiUrl = apiUrl.concat(`&type=${question_type}`);
+    }
+
+    const { response, loading } = useAxios({ url: apiUrl });
+
+
+    useEffect(() => {
+        if (response?.data.results.length) {
+            const question = response?.data.results[questionIndex];
+            let answers = [...question.incorrect_answers];
+            answers.splice(
+                getRandomInt(question.incorrect_answers.length),
+                0,
+                question.correct_answer
+            );
+            setOptions(answers);
         }
-    };
+    }, [response, questionIndex]);
 
+    const handleClickAnswer = (e: React.MouseEvent<HTMLButtonElement>) => {
+        const question = response?.data.results[questionIndex];
+        if (e.currentTarget.textContent === question.correct_answer) {
+            dispatch(handleScoreChange(score + 1));
+        }
+
+        if (questionIndex + 1 < response?.data.results.length) {
+            setQuestionIndex(questionIndex + 1);
+        }
+    }
+    if (loading) {
+        return (
+            <Box mt={20}>
+                <CircularProgress />
+            </Box>
+        )
+    }
     return (
-        <form onSubmit={handleSubmit}>
-            <FormControl sx={{ m: 3 }} error={error} variant="standard">
-                <FormLabel id="demo-error-radios">Pop quiz: MUI is...</FormLabel>
-                <RadioGroup
-                    aria-labelledby="demo-error-radios"
-                    name="quiz"
-                    value={value}
-                    onChange={handleRadioChange}
-                >
-                    <FormControlLabel value="best" control={<Radio />} label="The best!" />
-                    <FormControlLabel value="worst" control={<Radio />} label="The worst." />
-                </RadioGroup>
-                <FormHelperText>{helperText}</FormHelperText>
-                <Button sx={{ mt: 1, mr: 1 }} type="submit" variant="outlined">
-                    Check Answer
-                </Button>
-            </FormControl>
-        </form>
+        <Box>
+            <Typography variant="h4">Questions {questionIndex + 1}</Typography>
+            <Typography mt={5}>
+                {decode(response?.data.results[questionIndex].question)}
+            </Typography>
+            {options.map((data, id) => (
+                <Box mt={2} key={id}>
+                    <Button onClick={handleClickAnswer} variant="contained">
+                        {decode(data)}
+                    </Button>
+                </Box>
+            ))}
+            <Box mt={5}>
+                Score: {score} / {response?.data.results.length}
+            </Box>
+        </Box>
     );
 }
 
