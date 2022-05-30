@@ -11,7 +11,6 @@ const Setting = () => {
 
     const { question_category, question_difficulty, question_type, amount_of_question } = useSelector((store: RootState) => store.setting)
 
-    console.log(question_category, question_difficulty, question_type, amount_of_question)
     const handleSubmit = (event: React.FormEvent) => {
         event.preventDefault()
         Router.push("/questions")
