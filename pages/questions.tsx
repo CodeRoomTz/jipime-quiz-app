@@ -6,6 +6,7 @@ import { RootState } from '../store'
 import useAxios from '../hooks/useAxios';
 import { decode } from 'html-entities';
 import { handleScoreChange } from '../store/features/scoreSlice/scoreSlice';
+import Router from 'next/router';
 
 const getRandomInt = (max: number) => {
     return Math.floor(Math.random() * Math.floor(max));
@@ -61,6 +62,8 @@ const Questions = () => {
 
         if (questionIndex + 1 < response?.data.results.length) {
             setQuestionIndex(questionIndex + 1);
+        } else {
+            Router.push("/score")
         }
     }
     if (loading) {
